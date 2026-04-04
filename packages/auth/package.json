@@ -9,22 +9,7 @@
       "types": "./index.ts",
       "default": "./index.ts"
     },
-    "./middleware": {
-      "types": "./middleware.ts",
-      "default": "./middleware.ts"
-    },
-    "./guards": {
-      "types": "./guards.tsx",
-      "default": "./guards.tsx"
-    },
-    "./hooks": {
-      "types": "./hooks.ts",
-      "default": "./hooks.ts"
-    },
-    "./config": {
-      "types": "./config.ts",
-      "default": "./config.ts"
-    }
+    "./*": "./*"
   },
   "dependencies": {
     "@forcisos/types": "*",
