@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import './globals.css';
+import Providers from './providers';
 
 export const metadata: Metadata = {
   title: 'Trainer Portal - Forcisos',
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-light-bg">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
