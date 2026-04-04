@@ -4,6 +4,11 @@
     "**/.env.local",
     "**/.env"
   ],
+  "globalEnv": [
+    "NEXTAUTH_URL",
+    "NEXTAUTH_SECRET",
+    "NEXT_PUBLIC_API_URL"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
@@ -16,6 +21,11 @@
       "outputs": [
         ".next/**",
         "dist/**"
+      ],
+      "env": [
+        "NEXTAUTH_URL",
+        "NEXTAUTH_SECRET",
+        "NEXT_PUBLIC_API_URL"
       ]
     },
     "lint": {
