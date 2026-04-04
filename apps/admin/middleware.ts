@@ -1,4 +1,4 @@
-import { withAuth, roleGuard } from '@forcisos/auth';
+import { withAuth, roleGuard } from '@forcisos/auth/middleware';
 
 export const middleware = roleGuard('administrator');
 
