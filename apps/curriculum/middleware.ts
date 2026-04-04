@@ -1,4 +1,4 @@
-import { roleGuard } from '@forcisos/auth';
+import { roleGuard } from '@forcisos/auth/middleware';
 
 const roleMap: Record<string, any> = {
   partner: 'fc_partner',
