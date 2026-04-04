@@ -1,4 +1,4 @@
-import { roleGuard } from '@forcisos/auth';
+import { roleGuard } from '@forcisos/auth/middleware';
 
 export const middleware = roleGuard('fc_trainer');
 
