@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
-import '../globals.css';
+import './globals.css';
 import { authConfig } from '@forcisos/auth';
 
 export const metadata: Metadata = {
