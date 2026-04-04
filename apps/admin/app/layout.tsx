@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
 import './globals.css';
+import Providers from './providers';
 import { authConfig } from '@forcisos/auth';
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="bg-light-bg">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
