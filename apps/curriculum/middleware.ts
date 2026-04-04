@@ -1,11 +1,11 @@
-import { roleGuard } from '@forcisos/auth/middleware';
+import { withAuth } from '@forcisos/auth/middleware';
+import { NextRequest } from 'next/server';
 
-const roleMap: Record<string, any> = {
-  partner: 'fc_partner',
-  curriculum: ['fc_curriculum_mgr', 'administrator'],
-};
-
-export const middleware = roleGuard(roleMap['$app']);
+export async function middleware(request: NextRequest) {
+  return withAuth(request, {
+    requiredRoles: ['fc_curriculum_mgr', 'administrator'] as any[],
+  });
+}
 
 export const config = {
   matcher: ['/((?!login|api|_next|.*\\..*).*)'],

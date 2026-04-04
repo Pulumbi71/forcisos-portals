@@ -1,6 +1,11 @@
-import { withAuth, roleGuard } from '@forcisos/auth/middleware';
+import { withAuth } from '@forcisos/auth/middleware';
+import { NextRequest } from 'next/server';
 
-export const middleware = roleGuard('administrator');
+export async function middleware(request: NextRequest) {
+  return withAuth(request, {
+    requiredRoles: ['administrator'] as any[],
+  });
+}
 
 export const config = {
   matcher: ['/((?!login|api|_next|.*\\..*).*)'],
