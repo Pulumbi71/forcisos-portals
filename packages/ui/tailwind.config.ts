@@ -11,7 +11,7 @@ const config: Config = {
         navy: '#1B2A4A',
         teal: '#00BCD4',
         'cta-red': '#E63946',
-        'light-bg': '#F8FAFB',
+        'light-bg': '#FFF8F0',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
