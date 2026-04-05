@@ -13,7 +13,7 @@ export async function withAuth(request: NextRequest, options: AuthMiddlewareOpti
   if (token.error === 'RefreshAccessTokenError') return NextResponse.redirect(new URL('/login', request.url));
   if (requiredRoles.length > 0) {
     const userRole = (token.user as Record<string, string>)?.role;
-    if (!userRole || !requiredRoles.includes(userRole as UserRole)) return NextResponse.redirect(new URL('/unauthorized', request.url));
+    if (!userRole || !requiredRoles.includes(userRole as UserRole)) return NextResponse.redirect(new URL('/login?error=unauthorized', request.url));
   }
   return NextResponse.next();
 }

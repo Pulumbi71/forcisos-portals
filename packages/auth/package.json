@@ -4,6 +4,13 @@
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./config": "./config.ts",
+    "./middleware": "./middleware.ts",
+    "./hooks": "./hooks.ts",
+    "./guards": "./guards.ts"
+  },
   "dependencies": {
     "@forcisos/types": "*",
     "@forcisos/api": "*",
