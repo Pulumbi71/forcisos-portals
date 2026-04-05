@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import { PortalLayout, StatCard, Sidebar, Header } from '@forcisos/ui';
-import { Users, DollarSign, BookOpen, UserCheck, Settings, FileText, ShoppingCart, MessageSquare, LogBook, Home } from 'lucide-react';
+import { Users, DollarSign, BookOpen, UserCheck, Settings, FileText, ShoppingCart, MessageSquare, Notebook, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminDashboard() {
@@ -17,7 +17,7 @@ export default function AdminDashboard() {
     { label: 'Coupons', href: '/coupons', icon: <Settings size={20} /> },
     { label: 'Bookings', href: '/bookings', icon: <MessageSquare size={20} /> },
     { label: 'Communications', href: '/communications', icon: <MessageSquare size={20} /> },
-    { label: 'Audit Log', href: '/audit-log', icon: <LogBook size={20} /> },
+    { label: 'Audit Log', href: '/audit-log', icon: <Notebook size={20} /> },
     { label: 'Settings', href: '/settings', icon: <Settings size={20} /> },
   ];
 
