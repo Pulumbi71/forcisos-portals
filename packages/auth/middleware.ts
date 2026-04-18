@@ -27,7 +27,7 @@ export async function withAuth(
     supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       cookies: {
         getAll() {
-          return request.cookies.getSetCookie();
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
           // This won't actually set cookies here, but we handle it in the response
