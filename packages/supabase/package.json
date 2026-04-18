@@ -1,0 +1,11 @@
+{
+  "name": "@forcisos/supabase",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./client.ts",
+  "types": "./client.ts",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/ssr": "^0.0.10"
+  }
+}
