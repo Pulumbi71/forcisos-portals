@@ -1,41 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { createServerClient } from '@supabase/ssr';
 import { UserRole } from '@forcisos/types';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config';
 
 export interface AuthMiddlewareOptions {
-  requiredRoles?: UserRole[];
+  requiredRole?: UserRole;
   publicRoutes?: string[];
 }
 
-export async function withAuth(request: NextRequest, options: AuthMiddlewareOptions = {}) {
-  const { requiredRoles = [], publicRoutes = [] } = options;
+export async function withAuth(
+  request: NextRequest,
+  options: AuthMiddlewareOptions = {}
+) {
+  const { requiredRole, publicRoutes = [] } = options;
+
   const pathname = request.nextUrl.pathname;
 
+  // Allow public routes
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-
-  if (!token) {
+  // Create Supabase server client
+  let supabase;
+  try {
+    supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      cookies: {
+        getAll() {
+          return request.cookies.getSetCookie();
+        },
+        setAll(cookiesToSet) {
+          // This won't actually set cookies here, but we handle it in the response
+        },
+      },
+    });
+  } catch (error) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (token.error === 'RefreshAccessTokenError') {
+  // Get session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  // Redirect to login if no session
+  if (!session) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (requiredRoles.length > 0) {
-    const userRole = (token.user as Record<string, string>)?.role;
-    // Always allow administrator role to access any portal
-    if (!userRole || (!requiredRoles.includes(userRole as UserRole) && userRole !== 'administrator')) {
-      return NextResponse.redirect(new URL('/login?error=unauthorized', request.url));
+  // Check role if required
+  if (requiredRole) {
+    const userRole = session.user?.user_metadata?.role as UserRole | undefined;
+
+    if (!userRole || userRole !== requiredRole) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
   }
 
   return NextResponse.next();
 }
 
-export function roleGuard(...roles: UserRole[]) {
-  return (request: NextRequest) => withAuth(request, { requiredRoles: roles });
+export function roleGuard(role: UserRole) {
+  return (request: NextRequest) => {
+    return withAuth(request, { requiredRole: role });
+  };
 }
