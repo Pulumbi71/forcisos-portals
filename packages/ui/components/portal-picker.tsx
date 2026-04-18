@@ -1,7 +1,7 @@
 'use client';
 
 import { usePortalAccess } from '@forcisos/auth';
-import { Card } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
 
 export function PortalPicker() {
   const { accessiblePortals } = usePortalAccess();
@@ -18,7 +18,7 @@ export function PortalPicker() {
         >
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-light-bg rounded-lg flex items-center justify-center text-teal">
-              <Card size={24} />
+              <LayoutDashboard size={24} />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-navy">{portal.name}</h3>
