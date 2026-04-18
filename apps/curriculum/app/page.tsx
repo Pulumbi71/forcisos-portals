@@ -1,98 +1,87 @@
 'use client';
 
 import { PortalLayout, StatCard } from '@forcisos/ui';
-import { BookMarked, Home, Users, DollarSign, BarChart3, FileText, Grid3x3, Tag } from 'lucide-react';
+import { BookMarked, Home, Users, DollarSign, BarChart3, FileText, LayoutGrid, Tag } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@forcisos/supabase';
+import { getNavItems } from '../lib/nav-items';
+
+interface Module {
+  id: string;
+  title: string;
+  is_featured: boolean;
+  sort_order: number;
+}
+
+interface Review {
+  id: string;
+  review_text: string;
+  score: number;
+}
+
+interface Enrollment {
+  price_paid: number;
+}
 
 export default function CurriculumDashboard() {
-  const navItems = [
-    { label: 'Dashboard', href: '/', icon: <Home size={20} />, active: true },
-    { label: 'Courses', href: '/courses', icon: <BookMarked size={20} /> },
-    { label: 'Modules', href: '/courses', icon: <Grid3x3 size={20} /> },
-    { label: 'Cohorts', href: '/cohorts', icon: <Users size={20} /> },
-    { label: 'Trainers', href: '/trainers', icon: <Users size={20} /> },
-    { label: 'Reviews', href: '/reviews', icon: <FileText size={20} /> },
-    { label: 'Statistics', href: '/statistics', icon: <BarChart3 size={20} /> },
-    { label: 'Categories', href: '/categories', icon: <Tag size={20} /> },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [totalModules, setTotalModules] = useState(0);
+  const [activeCohorts, setActiveCohorts] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [popularModules, setPopularModules] = useState<Module[]>([]);
+  const [pendingReviews, setPendingReviews] = useState<Review[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
+  const navItems = getNavItems('dashboard');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const { count: modulesCount, error: modulesError } = await supabase
+          .from('modules')
+          .select('*', { count: 'exact', head: true });
+        if (modulesError) throw modulesError;
+        setTotalModules(modulesCount || 0);
+
+        const { count: cohortsCount, error: cohortsError } = await supabase
+          .from('cohorts')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'active');
+        if (cohortsError) throw cohortsError;
+        setActiveCohorts(cohortsCount || 0);
+
+        const { data: enrollments, error: enrollmentsError } = await supabase
+          .from('cohort_enrollments')
+          .select('price_paid');
+        if (enrollmentsError) throw enrollmentsError;
+        const revenue = enrollments?.reduce((sum: number, e: Enrollment) => sum + (e.price_paid || 0), 0) || 0;
+        setTotalRevenue(revenue);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="p-8 text-gray-600">Loading...</div>;
+  if (error) return <div className="p-8 text-red-600">{error}</div>;
+
+  const navItems2 = getNavItems('dashboard');
   const stats = [
-    {
-      icon: <BookMarked size={24} />,
-      label: 'Total Courses',
-      value: '28',
-      trend: { value: 3, isPositive: true, label: 'new this month' },
-    },
-    {
-      icon: <Users size={24} />,
-      label: 'Active Cohorts',
-      value: '15',
-      trend: { value: 2, isPositive: true, label: 'new cohorts' },
-    },
-    {
-      icon: <DollarSign size={24} />,
-      label: 'Total Revenue',
-      value: '$124,560',
-      trend: { value: 18, isPositive: true, label: 'vs last month' },
-    },
-    {
-      icon: <BarChart3 size={24} />,
-      label: 'Avg Completion',
-      value: '82%',
-      trend: { value: 4, isPositive: true, label: 'vs last month' },
-    },
+    { icon: <BookMarked size={24} />, label: 'Total Modules', value: totalModules.toString(), trend: { value: 0, isPositive: true, label: 'in system' } },
+    { icon: <Users size={24} />, label: 'Active Cohorts', value: activeCohorts.toString(), trend: { value: 0, isPositive: true, label: 'running now' } },
+    { icon: <DollarSign size={24} />, label: 'Total Revenue', value: `$${totalRevenue.toLocaleString('en-US')}`, trend: { value: 0, isPositive: true, label: 'all time' } },
   ];
-
   return (
-    <PortalLayout
-      navItems={navItems}
-      logo={<BookMarked className="text-teal" size={24} />}
-      sidebarTitle="Curriculum Portal"
-      headerTitle="Curriculum Management"
-    >
+    <PortalLayout navItems={navItems2} logo={<BookMarked className="text-teal" size={24} />} sidebarTitle="Curriculum Portal" headerTitle="Curriculum Management">
       <div className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => (
-            <StatCard key={stat.label} {...stat} />
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-navy mb-4">Popular Courses</h2>
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center justify-between pb-4 border-b border-gray-100 last:border-0">
-                  <div>
-                    <p className="font-medium text-navy">Course {i}: Advanced Topic</p>
-                    <p className="text-sm text-gray-600 mt-1">{(i + 1) * 23} enrollments</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-teal">4.{8 - i}</p>
-                    <p className="text-xs text-gray-500">rating</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-navy mb-4">Pending Reviews</h2>
-            <div className="space-y-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="p-3 bg-light-bg rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-navy">Review {i}</p>
-                      <p className="text-xs text-gray-600 mt-1">Course {i}</p>
-                    </div>
-                    <button className="text-teal hover:text-teal/80 text-sm font-semibold">
-                      Review
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {stats.map(s => <StatCard key={s.label} {...s} />)}
         </div>
       </div>
     </PortalLayout>
