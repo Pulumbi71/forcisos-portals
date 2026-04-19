@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
 import { ReactNode } from 'react';
-import './globals.css';
-import Providers from './providers';
-import { authConfig } from '@forcisos/auth';
+import '../globals.css';
 
 export const metadata: Metadata = {
   title: 'Admin Portal - Forcisos',
@@ -15,12 +12,10 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
-  const session = await getServerSession(authConfig);
-
   return (
     <html lang="en">
       <body className="bg-light-bg">
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );
