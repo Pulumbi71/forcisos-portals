@@ -5,3 +5,4 @@ export {
   useIsAuthenticated,
   useAuthError,
 } from './hooks';
+export { withAuth, roleGuard } from './middleware';
