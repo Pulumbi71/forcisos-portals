@@ -4,7 +4,7 @@ import { UserRole } from '@forcisos/types';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config';
 
 export interface AuthMiddlewareOptions {
-  requiredRole?: UserRole;
+  requiredRole?: UserRole | UserRole[];
   publicRoutes?: string[];
 }
 
@@ -51,8 +51,9 @@ export async function withAuth(
   // Check role if required
   if (requiredRole) {
     const userRole = session.user?.user_metadata?.role as UserRole | undefined;
+    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
 
-    if (!userRole || userRole !== requiredRole) {
+    if (!userRole || !allowedRoles.includes(userRole)) {
       return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
   }
@@ -60,7 +61,7 @@ export async function withAuth(
   return NextResponse.next();
 }
 
-export function roleGuard(role: UserRole) {
+export function roleGuard(role: UserRole | UserRole[]) {
   return (request: NextRequest) => {
     return withAuth(request, { requiredRole: role });
   };
