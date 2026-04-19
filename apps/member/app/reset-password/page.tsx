@@ -1,9 +1,7 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import { useState, useEffect, FormEvent } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@forcisos/auth';
 
@@ -11,7 +9,6 @@ type Stage = 'loading' | 'set-password' | 'success' | 'error';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [stage, setStage] = useState<Stage>('loading');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,7 +19,9 @@ export default function ResetPasswordPage() {
   const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   useEffect(() => {
-    const code = searchParams.get('code');
+    // Read code from URL without useSearchParams to avoid prerender issues
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
     if (!code) { setStage('error'); setError('Invalid or missing reset code. Please request a new password reset link.'); return; }
     supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
       if (exchangeError) { setStage('error'); setError('This reset link has expired or already been used. Please request a new one.'); }
