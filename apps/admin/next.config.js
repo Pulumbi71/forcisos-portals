@@ -2,10 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  transpilePackages: ['@forcisos/types', '@forcisos/api', '@forcisos/auth', '@forcisos/ui', '@forcisos/supabase'],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  typescript: { ignoreBuildErrors: true },
+  transpilePackages: ['@forcisos/types', '@forcisos/api', '@forcisos/auth', 'Fforcisos/ui', '@forcisos/supabase'],
 };
 
 module.exports = nextConfig;
