@@ -19,14 +19,36 @@ export default function ResetPasswordPage() {
   const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   useEffect(() => {
-    // Read code from URL without useSearchParams to avoid prerender issues
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    if (!code) { setStage('error'); setError('Invalid or missing reset code. Please request a new password reset link.'); return; }
-    supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
-      if (exchangeError) { setStage('error'); setError('This reset link has expired or already been used. Please request a new one.'); }
-      else { setStage('set-password'); }
-    });
+    const init = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+
+      if (!code) {
+        // No code — check if client already set up a session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) { setStage('set-password'); }
+        else { setStage('error'); setError('Invalid or missing reset code. Please request a new password reset link.'); }
+        return;
+      }
+
+      // Try explicit exchange first
+      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      if (!exchangeError) {
+        setStage('set-password');
+        return;
+      }
+
+      // Exchange failed — the Supabase client may have auto-exchanged it already
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setStage('set-password');
+      } else {
+        setStage('error');
+        setError('This reset link has expired or already been used. Please request a new one.');
+      }
+    };
+
+    init();
   }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
